@@ -1,9 +1,9 @@
 after downloading this folder
-
-cd "path to this folder"
+<br />
+cd "path to this folder" <br />
 npm install dependencies --save
-
+<br /> <br />
 if the above thing does not work try
-
-cd "path to this folder"
+<br /> <br />
+cd "path to this folder" <br />
 npm install dependencies
