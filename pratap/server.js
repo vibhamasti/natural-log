@@ -1,11 +1,11 @@
-var express = require('express');
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var mustacheExpress = require('mustache-express');
+let express = require('express');
+let session = require('express-session');
+let bodyParser = require('body-parser');
+let mustacheExpress = require('mustache-express');
 
-var app = express();
-var mysql = require('mysql');
-var md5 = require('md5');
+let app = express();
+let mysql = require('mysql');
+let md5 = require('md5');
 
 app.use(session({ secret: 'ssshhhhh', saveUninitialized: true, resave: true }));
 app.use(bodyParser.json());
@@ -16,34 +16,46 @@ app.engine('html', mustacheExpress());  // set mustache render engine stuff
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');
 
-var sess;
+let sess;
 
-var con = mysql.createConnection({      //set the sql username and password so that our server can connect to the sql database
+let con = mysql.createConnection({      //set the sql username and password so that our server can connect to the sql database
   host: "localhost",
   user: "root",
   password: "",
   database: "natural_log"
 });
 
+con.connect(function (err) {                 //connect to database
+    if (err) throw err;
+    console.log("Connected!");
+});
+
+function getpw(username,callback)
+{
+    con.query("select password from users where username = '" + username + "'", function (err, result) {
+        if (err) throw err;
+        console.log(result[0].password);
+        return callback(result);
+        });
+}
 
 function oauth(req,res)                 // authorization function which authenticates the user
 {
     sess = req.session;
-    if (sess.oauth)
-    {
+    if (sess.oauth) {
         res.redirect('/app');
     }
-    else if (req.body.user == 'pratap' || req.body.user == 'vibha' || req.body.user == 'aaina')
-    {
+    getpw(req.body.user, function (result) {
+        if (md5(req.body.password) == result[0].password) {
+            sess.usr = req.body.user;       //if authorized then store a cookie(<3<3) 
+            sess.oauth = true;              //store that they are authorized user
+            res.redirect('/app');           //redirect to the actual page
+        }
+        else {
+            res.end("USERNAME PASSWORD DOESNOT MATCH");
+        }
         
-        sess.usr = req.body.user;       //if authorized then store a cookie(<3<3) 
-        sess.oauth = true;              //store that they are authorized user
-        res.redirect('/app');           //redirect to the actual page
-    }
-    else
-    {
-        res.send("username not found");
-    }
+    });
 }
 
 app.get('/', function (req, res) {      //checks to see if the user has alredy logged in or no. if they have, then redirect to the main page else to login
@@ -61,15 +73,13 @@ app.get('/register', function (req, res) {      //registeration form
 });
 
 app.post('/reg', function (req, res) {          //stores the registeration form into a sql server
-    var username = req.body.usr;
-    var password = md5(req.body.psswrd);
-    var firstname = req.body.fname;             //extracts the user form data and stores it into discrete individual variables
-    var lastname = req.body.lname;
-    var position = req.body.pos;
+    let username = req.body.usr;
+    let password = md5(req.body.psswrd);
+    let firstname = req.body.fname;             //extracts the user form data and stores it into discrete individual letiables
+    let lastname = req.body.lname;
+    let position = req.body.pos;
 
-    con.connect(function(err) {                 //connect to database
-        if (err) throw err;
-        console.log("Connected!");
+    
         con.query("insert into users values ("+"'"+username+"'"+","+"'"+password+"'"+","+"'"+position+"'"+","+"'"+firstname+"'"+","+"'"+lastname+"'"+")", function (err, result) {      //the query
             if (err) {
                 console.log(err.code);
@@ -83,7 +93,6 @@ app.post('/reg', function (req, res) {          //stores the registeration form 
         });
     });
    
-});
 
 app.post('/login', oauth);
 
