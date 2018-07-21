@@ -1,5 +1,5 @@
 var express = require('express');
-var bodyParser = require('body-parser');
+var bodyParser = require('body-parser'); // why?
 var mustacheExpress = require('mustache-express');
 var app = express();
 
