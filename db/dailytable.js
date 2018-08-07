@@ -26,6 +26,8 @@ class DailyTable {
     getTableName() {
         return this.tablename;
     }
+    
+    // for today
     makeEntry(username, cls, period, des) {
         // TODO: check for testschool necessity
         let qry = "ENTER INTO testschool." + this.tablename + " VALUES ('" + username + "',  '" + cls + "', '" + period + "', '" + des + "');";
@@ -35,9 +37,9 @@ class DailyTable {
     // for days prior to today
     makeEntry(username, cls, period, des, table_name) {
         // checks if table exists and enters data into it
-        let qry = "IF (SELECT count(*)FROM information_schema.tables WHERE table_schema ='testschool'AND table_name ='" + tablename + "') > 0\
+        let qry = "IF (SELECT count(*)FROM information_schema.tables WHERE table_schema ='testschool'AND table_name ='" + table_name + "') > 0\
         THEN\
-        ENTER INTO testschool." + this.tablename + 
+        ENTER INTO testschool." + table_name + 
         " VALUES ('" + username + "',  '" + cls + "', '" + period + "', '" + des + "')\
         END IF";
 

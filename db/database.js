@@ -16,12 +16,13 @@
 
 // create table every day
 let todayTable = new CronJob({
-  cronTime: '00 01 00 * * 1-6',
-  //cronTime: '* * * * * *', // every second (for testing)
+  //cronTime: '00 01 00 * * 1-6',
+  cronTime: '* * * * * *', // every second (for testing)
   onTick: () => {
     let today = new DailyTable();
     today.refresh();
     today.createTable();
+    //console.log(today.tablename);
     //console.log("Created!!");
     /*
      * Runs every working day (Monday through Saturday)
